@@ -1,99 +1,114 @@
 <?php
-
 namespace Routes;
-use Controllers\CategoryController;
-use Controllers\AuthController;
-use Controllers\PaymentController;
-use Controllers\ProductoController;
-use Lib\Router;  
-use Src\Controllers\ErrorController;
-use Lib\Database;
-use Controllers\PedidoController;
+
+use Controllers\EspController;
+use Controllers\PacienteController;
 use Controllers\MedicoController;
+use Lib\Router;
 
 class Routes {
     public static function index() {
         error_log("Checkpoint: Entrando a Routes::index");
 
+        // Ruta principal de inicio
         Router::add('GET', '/', function () {
             error_log("Checkpoint: Cargando la vista de inicio");
-            // Usa tu clase Pages para cargar la vista de inicio
             $pages = new \Lib\Pages();
             $pages->render('inicio'); 
         });
 
-        
+        // Rutas de paciente
 
-
-
-        Router::add('GET', '/listus/', function () {
-            if (!isset($_SESSION['user']) || $_SESSION['user']['rol'] !== 'admin') {
-                error_log("Acceso denegado a admin, redirigiendo a /error/");
-                return (new ErrorController())->error404();
-            }
-        
-        });
-        
-        
-        // Ruta para errores
-        Router::add('GET', '/error/', function () {
-            error_log("Checkpoint: Ruta de error ejecutada");
-            return (new ErrorController())->error404();
-        });
-        
-        /* AUTH */
+        // Ruta para mostrar el formulario de registro
         Router::add('GET', '/register', function () {
             error_log("Checkpoint: Ruta GET /register ejecutada");
-            (new AuthController())->register();
+            (new PacienteController())->crearPaciente();
         });
 
-        Router::add('POST', 'register', function () {
+        // Ruta para registrar un nuevo paciente (POST)
+        Router::add('POST', '/register', function () {
             error_log("Checkpoint: Ruta POST /register ejecutada");
-            (new AuthController())->register();
+            (new PacienteController())->crearPaciente();
         });
 
-        // login
-        Router::add('GET', 'login', function () {
+        // Ruta para confirmar el registro
+        Router::add('GET', '/confirmarRegistro', function () {
+            (new PacienteController())->confirmarRegistro();
+        });
+
+        // Ruta para mostrar el formulario de inicio de sesión
+        Router::add('GET', '/login', function () {
             error_log("Checkpoint: Ruta GET /login ejecutada");
-            (new AuthController())->login();
+            (new PacienteController())->iniciarSesion();
         });
 
-        Router::add('POST', 'login', function () {
+        // Ruta para procesar el inicio de sesión (POST)
+        Router::add('POST', '/login', function () {
             error_log("Checkpoint: Ruta POST /login ejecutada");
-            (new AuthController())->processLogin();
+            (new PacienteController())->iniciarSesion();
         });
 
-      
+        // Ruta para cerrar sesión
+        Router::add('GET', '/logout', function () {
+            error_log("Checkpoint: Ruta GET /logout ejecutada");
+            (new PacienteController())->cerrarSesion();
+        });
 
+        // Ruta para procesar el cierre de sesión (POST)
+        Router::add('POST', '/logout', function () {
+            error_log("Checkpoint: Ruta POST /logout ejecutada");
+            (new PacienteController())->cerrarSesion();
+        });
+
+        // Ruta para recuperar la contraseña (GET)
+        Router::add('GET', '/resetPassword', function () {
+            (new PacienteController())->recuperarContrasena();
+        });
+
+        // Ruta para procesar la recuperación de contraseña (POST)
+        Router::add('POST', 'resetPassword', function () {
+            (new PacienteController())->recuperarContrasena();
+        });
+
+
+        Router::add('GET', '/restablecerContrasena', function () {
+            (new PacienteController())->restablecerContrasena();
+        });
+
+        // Ruta para procesar la recuperación de contraseña (POST)
+        Router::add('POST', 'restablecerContrasena', function () {
+            (new PacienteController())->restablecerContrasena();
+        });
+
+
+        // Otras rutas de ejemplo
         Router::add('GET', '/verP', function () {
-            (new MedicoController())->verMEDICOS();
+            // Aquí puedes agregar otro controlador, como el de Medico
+            (new MedicoController())->verMedicos();
         });
 
-      
+        Router::add('GET', '/verPacientes', function () {
+            // Aquí puedes agregar otro controlador, como el de Medico
+            (new PacienteController())->verPacientes();
+        });
 
-    Router::add('GET', '/confirmRegistration', function () {
-        (new AuthController())->confirmRegistration();
-    });
+        Router::add('GET', '/crearm', function () {
+            // Aquí puedes agregar otro controlador, como el de Medico
+            (new MedicoController())->crearMedico();
+        });
 
-
-    
-
-    Router::add('POST', '/sendPasswordRecoveryToken', function () {
-        (new AuthController())->sendPasswordRecoveryToken();
-    });
-
-    Router::add('GET', '/resetPassword', function () {
-        (new AuthController())->resetPassword();
-    });
-
-    Router::add('POST', '/resetPassword', function () {
-        (new AuthController())->resetPassword();
-    });
+        Router::add('GET', '/esp', function () {
+            // Aquí puedes agregar otro controlador, como el de Medico
+            (new EspController())->index();
+        });
 
 
-// ...existing code...
+        Router::add('POST', 'crearm', function () {
+            // Aquí puedes agregar otro controlador, como el de Medico
+            (new MedicoController())->crearMedico();
+        });
 
-
+        // Despachar la solicitud
         Router::dispatch();
     }
 }

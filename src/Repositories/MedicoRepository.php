@@ -5,38 +5,37 @@ namespace Repositories;
 use Models\Medico;
 use PDO;
 use PDOException;
-use Exception;
 
 class MedicoRepository {
-    private $db;
+    private $pdo;
 
-    public function __construct(PDO $db) {
-        $this->db = $db;
+    public function __construct(PDO $pdo) {
+        $this->pdo = $pdo;
     }
 
-    
-
-    public function findAll() {
-        $stmt = $this->db->query("SELECT * FROM medicos");
-        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        return array_map(function($data) {
-            return Medico::fromArray($data);
-        }, $result);
+    public function getAll(): array {
+        try {
+            $stmt = $this->pdo->query("SELECT * FROM medicos");
+            $medicos = [];
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $medicos[] = Medico::fromArray($row);
+            }
+            return $medicos;
+        } catch (PDOException $e) {
+            throw new \Exception("Error al obtener los médicos: " . $e->getMessage());
+        }
     }
 
-
-    // Repositorio ProductoRepository
-    public function getAllMedicos() {
-    $sql = "SELECT * FROM medicos";
-    $stmt = $this->db->prepare($sql);
-    $stmt->execute();
-    $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
-    return $result;
+    public function add(Medico $medico): bool {
+        try {
+            $stmt = $this->pdo->prepare("INSERT INTO medicos (nombre, apellidos, especialidad) VALUES (:nombre, :apellidos, :especialidad)");
+            return $stmt->execute([
+                ':nombre' => $medico->getNombre(),
+                ':apellidos' => $medico->getApellido(),
+                ':especialidad' => $medico->getEspecialidad()
+            ]);
+        } catch (PDOException $e) {
+            throw new \Exception("Error al añadir médico: " . $e->getMessage());
+        }
     }
-
 }
-    
-    
-
-

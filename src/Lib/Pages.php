@@ -1,7 +1,7 @@
 <?php
 namespace Lib;
 class Pages{
-    public function render(string $pageName,array $params = null): void
+    public static function  render(string $pageName,array $params = null): void
     {
         if($params != null)
         {

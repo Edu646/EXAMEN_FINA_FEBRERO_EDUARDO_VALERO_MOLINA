@@ -3,10 +3,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-require_once(__DIR__ . '/../../../config/config.php'); 
-
-// Función para verificar si el usuario es administrador
-
+require_once(__DIR__ . '/../../../config/config.php');
 ?>
 
 <!DOCTYPE html>
@@ -14,7 +11,7 @@ require_once(__DIR__ . '/../../../config/config.php');
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clinica</title>
+    <title>Clínica</title>
     <style>
         /* Reset CSS */
         * {
@@ -71,38 +68,6 @@ require_once(__DIR__ . '/../../../config/config.php');
             padding: 20px;
         }
 
-        .admin-section {
-            background-color: #222;
-            color: #fff;
-            padding: 10px;
-            margin-top: 20px;
-            text-align: center;
-        }
-
-        .admin-section h2 {
-            margin-bottom: 10px;
-        }
-
-        .admin-section ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        .admin-section ul li {
-            display: inline-block;
-            margin: 0 10px;
-        }
-
-        .admin-section ul li a {
-            color: #ffcc00;
-            text-decoration: none;
-            font-weight: bold;
-        }
-
-        .admin-section ul li a:hover {
-            text-decoration: underline;
-        }
-
         footer {
             background: #333;
             color: #fff;
@@ -114,7 +79,7 @@ require_once(__DIR__ . '/../../../config/config.php');
         }
 
         @media (max-width: 768px) {
-            nav ul li, .admin-section ul li {
+            nav ul li {
                 display: block;
                 margin: 10px 0;
             }
@@ -124,28 +89,51 @@ require_once(__DIR__ . '/../../../config/config.php');
 <body>
 
 <header>
-    <h1>Bienvenido a la clinica</h1>
+    <h1>Bienvenido a la clínica</h1>
     <nav>
         <ul>
-            <?php if (isset($_SESSION['user'])): ?>
-                <li>Bienvenido, <strong><?= htmlspecialchars($_SESSION['nombre']) ?></strong></li>
+            <?php if (isset($_SESSION['paciente_id'])): ?>
+                <li>Bienvenido, <strong><?= htmlspecialchars($_SESSION['nombre'] ?? 'Paciente') ?></strong></li>
                 <li><a href="<?= BASE_URL ?>logout">Cerrar Sesión</a></li>
-                <li><a href="<?= BASE_URL ?>ver">Lista Especialidades</a></li>
-                <li><a href="<?= BASE_URL ?>verP">Lista de Medicos</a></li>
-                <li><a href="<?= BASE_URL ?>carrito">citas</a></li>
+                <li><a href="<?= BASE_URL ?>esp">Lista Especialidades</a></li>
+                <li><a href="<?= BASE_URL ?>verP">Lista de Médicos</a></li>
+                <li><a href="<?= BASE_URL ?>citas">Mis Citas</a></li>
+
+                <?php if (isset($_SESSION['ROL']) && $_SESSION['ROL'] === 'paciente'): ?>
+                    <li><a href="<?= BASE_URL ?>historial">Historial Médico</a></li>
+                    <li><a href="<?= BASE_URL ?>perfil">Mi Perfil</a></li>
+                <?php elseif (isset($_SESSION['ROL']) && $_SESSION['ROL'] === 'admin'): ?>
+                    <li><a href="<?= BASE_URL ?>verPacientes">Gestión de Usuarios</a></li>
+                    <li><a href="<?= BASE_URL ?>crearm">Crear medicos</a></li>
+                <?php endif; ?>
+
             <?php else: ?>
                 <li><a href="<?= BASE_URL ?>">Inicio</a></li>
                 <li><a href="<?= BASE_URL ?>login">Iniciar Sesión</a></li>
                 <li><a href="<?= BASE_URL ?>register">Registrarse</a></li>
-                <li><a href="<?= BASE_URL ?>ver">Lista Especialidades</a></li>
-                <li><a href="<?= BASE_URL ?>verP">Lista de Medicos</a></li>
+                <li><a href="<?= BASE_URL ?>esp">Lista Especialidades</a></li>
+                <li><a href="<?= BASE_URL ?>verP">Lista de Médicos</a></li>
             <?php endif; ?>
         </ul>
     </nav>
 </header>
 
+<div class="container">
+    <!-- El contenido específico para el rol puede ir aquí -->
+    <?php if (isset($_SESSION['ROL']) && $_SESSION['ROL'] === 'admin'): ?>
+        <h2>Panel de Administración</h2>
+        <p>Aquí puedes gestionar el sistema, usuarios, reportes y configuraciones.</p>
+    <?php elseif (isset($_SESSION['ROL']) && $_SESSION['ROL'] === 'paciente'): ?>
+        <h2>Bienvenido, <?= htmlspecialchars($_SESSION['nombre']) ?></h2>
+        <p>Tu panel de paciente está listo para gestionar tus citas y ver tus especialidades y médicos.</p>
+    <?php else: ?>
+        <h2>Bienvenido a la clínica</h2>
+        <p>Inicia sesión o regístrate para acceder a más funciones.</p>
+    <?php endif; ?>
+</div>
+
 <footer>
-    <p>&copy; 2025 Tiendilla. Todos los derechos reservados.</p>
+    <p>&copy; 2025 Clínica. Todos los derechos reservados.</p>
 </footer>
 
 </body>

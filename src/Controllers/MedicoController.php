@@ -8,35 +8,46 @@ use Lib\Pages;
 use Lib\Database;
 use Models\Medico;
 use PDO;
-use PDOException;
 use Exception;
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception as PHPMailerException;
 
 class MedicoController {
-    private $MedicoService;
+    private $medicoService;
     private $pages;
 
     public function __construct() {
         $db = new Database();
         $pdo = $db->getConnection();
-        $MedicoRepository = new \Repositories\MedicoRepository($pdo);
-        $this->MedicoService = new MedicoService($MedicoRepository);
+        $medicoRepository = new MedicoRepository($pdo);
+        $this->medicoService = new MedicoService($medicoRepository);
         $this->pages = new Pages();
     }
 
-    
-
-
-    public function verMEDICOS() {
-        $Medicos = $this->MedicoService->getAllMedicos();
-        $this->pages->render('Medico/VerMedicos', ['Medicos' => $Medicos]);
-       
+    public function verMedicos() {
+        $medicos = $this->medicoService->getAllMedicos();
+        $this->pages->render('Medico/VerMedicos', ['medicos' => $medicos]);
     }
 
+    public function crearMedico() {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            try {
+                $nombre = $_POST['nombre'] ?? '';
+                $apellidos = $_POST['apellidos'] ?? '';
+                $especialidad = $_POST['especialidad'] ?? '';
 
+                if (empty($nombre) || empty($apellidos) || empty($especialidad)) {
+                    throw new Exception("Todos los campos son obligatorios");
+                }
 
-    
-    
-    
+                $medico = new Medico(null, $nombre, $apellidos, $especialidad);
+                $this->medicoService->addMedico($medico);
+
+                header('Location: /verP');
+                exit();
+            } catch (Exception $e) {
+                $this->pages->render('Medico/crearMedico', ['error' => $e->getMessage()]);
+            }
+        } else {
+            $this->pages->render('Medico/crearMedico');
+        }
+    }
 }

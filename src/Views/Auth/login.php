@@ -10,18 +10,27 @@
 
 <h3>Iniciar Sesión</h3>
 <form action="<?= BASE_URL ?>login" method="POST">
-    <label for="email">Correo Electrónico:</label>
-    <input type="email" id="email" name="email" required>
+    <label for="correo">Correo:</label>
+    <input type="email" name="correo" required>
 
     <label for="password">Contraseña:</label>
-    <input type="password" id="password" name="password" required>
+    <input type="password" name="password" required>
 
     <button type="submit">Iniciar Sesión</button>
 </form>
 
-<form action="<?= BASE_URL ?>sendPasswordRecoveryToken" method="POST">
-<button type="submit">
-    Recuperar Contraseña
-</button>
+<div class="container">
+    <h2>Recuperar Contraseña</h2>
+    <form action="<?= BASE_URL ?>resetPassword" method="POST">
+        <label for="correo">Introduce tu correo electrónico:</label>
+        <input type="email" name="correo" required>
+        
+        <button type="submit">Recuperar Contraseña</button>
+    </form>
 
-</form>
+    <?php if (isset($error_message)): ?>
+        <div class="message" style="color: red;">
+            <p><?= $error_message ?></p>
+        </div>
+    <?php endif; ?>
+</div>

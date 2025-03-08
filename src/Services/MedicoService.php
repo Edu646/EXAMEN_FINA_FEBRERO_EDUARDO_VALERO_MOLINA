@@ -1,24 +1,22 @@
-<?php 
+<?php
+
 namespace Services;
 
 use Repositories\MedicoRepository;
-use Models\Producto;
-use \PDO;
+use Models\Medico;
 
 class MedicoService {
-    private $MedicoRepository;
-   
-    public function __construct(MedicoRepository $MedicoRepository)
-    {
-        $this->MedicoRepository = $MedicoRepository;
+    private $medicoRepository;
+
+    public function __construct(MedicoRepository $medicoRepository) {
+        $this->medicoRepository = $medicoRepository;
     }
 
-    public function getAllMedicos()
-    {
-        return $this->MedicoRepository->findAll();
+    public function getAllMedicos(): array {
+        return $this->medicoRepository->getAll();
     }
 
-
-    
-
-}    
+    public function addMedico(Medico $medico): bool {
+        return $this->medicoRepository->add($medico);
+    }
+}
